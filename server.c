@@ -113,9 +113,19 @@ int main() {
         
         maxSd = (incomingSocketFD > serverFD) ? incomingSocketFD : serverFD; 
  
-        if (pselect(maxSd + 1, &readfds, NULL, NULL, NULL, &origMask) < 0 && errno != EINTR) { 
-            perror("pselect error"); 
-            exit(EXIT_FAILURE); 
+        if (pselect(maxSd + 1, &readfds, NULL, NULL, NULL, &origMask) != -1)
+        {
+            if (sighupReceived) {
+                printf("SIGHUP received.\n");
+                sighupReceived = 0;
+                continue;
+            }
+
+            if (errno != EINTR) {
+                perror("pselect error"); 
+                exit(EXIT_FAILURE); 
+            }
+        } exit(EXIT_FAILURE); 
         }
 
         // Reading incoming bytes
@@ -132,12 +142,6 @@ int main() {
             }
 
             printf("New connection.\n");
-        }
-
-        if (sighupReceived) {
-            printf("SIGHUP received.\n");
-            sighupReceived = 0;
-            continue;
         }
     }
 

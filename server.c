@@ -121,13 +121,16 @@ int main() {
                 continue;
             }
 
+            
+        } else {
             if (errno != EINTR) {
                 perror("pselect error"); 
                 exit(EXIT_FAILURE); 
             }
-        } exit(EXIT_FAILURE); 
         }
 
+        // пселект должен вернуть не -1 только если не -1 есть мсысл проводить проверку фд, если -1 то errno == einter если не eintr то ошибка, 
+    
         // Reading incoming bytes
         if (incomingSocketFD > 0 && FD_ISSET(incomingSocketFD, &readfds)) { 
             handleConnection(&incomingSocketFD);
@@ -142,7 +145,11 @@ int main() {
             }
 
             printf("New connection.\n");
+
+
         }
+
+        
     }
 
     close(serverFD);
